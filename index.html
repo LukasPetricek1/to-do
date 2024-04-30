@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/7842dc0936.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <section class="app">
+        <section class="to-do">
+
+            <header>
+                <div class="heading">
+                    <h1>To-Do List</h1>
+                    <img src="./images/todo.svg" alt="Todo Icon">
+                </div>
+                <div class="adding">
+                    <form>
+                        <input required type="text" id="item_text" placeholder="Add new item ...">
+                        <button type="submit">Add</button>
+                    </form>
+                </div>
+            </header>
+
+            <footer>
+                
+            </footer>
+
+        </section>
+    </section>
+
+    <script>
+        const form = document.querySelector("form")
+        const input = form.querySelector("input")
+
+        const content = document.querySelector("footer")
+
+        let data = localStorage.getItem("to-do")
+        if(!data){ 
+            data = []
+        }else{
+            data = sortData(JSON.parse(data))
+        }
+
+        function sortData(data){
+            let done = [], undone = []
+            for(let x of data){ 
+                if(x.done) done.push(x)
+                else undone.push(x)
+            }
+            return done.concat(undone)
+        }
+
+        function render(){
+            data = sortData(data)
+            content.innerHTML = "" 
+
+            function doneItem(id, item){
+                data = data.map(function(value){ 
+                    if(value.id == id){ 
+                        value.done = true
+                    }
+                    return value
+                })
+                localStorage.setItem("to-do" , JSON.stringify(data))
+                render()
+            }
+
+            function removeItem(id, item){ 
+                data = data.filter(a => a.id != id)
+                localStorage.setItem("to-do" , JSON.stringify(data))
+                render()
+            }
+
+            function reloadItem(id){ 
+                data = data.map(function(value){ 
+                    if(value.id == id){ 
+                        value.done = false
+                    }
+                    return value
+                })
+                localStorage.setItem("to-do" , JSON.stringify(data))
+                render()
+            }
+
+            for(let item of data){
+                const Item = document.createElement("div")
+                Item.setAttribute("class" , "item")
+
+                const icon = document.createElement("div")
+                icon.setAttribute("class" , "icon")
+                Item.appendChild(icon)
+
+                const p = document.createElement("p")
+                
+                const actions = document.createElement("section")
+                actions.setAttribute("class" , "actions")
+
+                const doneIcon = document.createElement("i")
+                doneIcon.setAttribute("class" , "fa-solid fa-check done")
+                doneIcon.addEventListener("click" , () => doneItem(item.id, p, icon))
+
+                const closeIcon = document.createElement("i")
+                closeIcon.setAttribute("class" , "fa-solid fa-xmark remove")
+                closeIcon.addEventListener("click" , () => removeItem(item.id, Item))
+
+                const reloadIcon = document.createElement("i")
+                reloadIcon.setAttribute("class" , "fa-solid fa-rotate-right")
+                reloadIcon.addEventListener("click" , () => reloadItem(item.id))
+
+                if(item.done){
+                    icon.style.backgroundColor = "lime"
+                    p.innerHTML = `<s>${item.text}</s>`
+                    actions.appendChild(reloadIcon)
+                    actions.appendChild(closeIcon)
+                }else{
+                    p.innerText = item.text
+                    actions.appendChild(doneIcon)
+                    actions.appendChild(closeIcon)
+                }
+
+                Item.appendChild(p)
+                Item.appendChild(actions)
+                content.appendChild(Item)
+            }
+        }
+
+        function add(e){ 
+            e.preventDefault()
+
+            const object = { 
+                text : input.value,
+                done : false, 
+                id : document.timeline.currentTime
+            }
+            data.push(object)
+            localStorage.setItem("to-do" , JSON.stringify(data))
+
+            input.value = ""
+
+            render()
+        }
+
+        render()
+
+        form.addEventListener("submit" , add)
+    </script>
+    
+</body>
+</html>
