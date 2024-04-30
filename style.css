@@ -119,8 +119,9 @@
 
     .to-do footer .item{
         position:relative;
-        height:50px;
+        height:auto;
         width:100%;
+        padding:10px 0px;
         display: flex;
         align-items: center;
         justify-content: space-around;
@@ -146,6 +147,7 @@
         font-weight:bold;
         font-size:1rem;
         max-width:30%;
+        height:auto;
         text-align: center;
         word-break: break-all;
     }
